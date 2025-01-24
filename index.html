@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form action="/addName" method="post">
+      <input type="text" name="name" placeholder="Name" />
+      <input type="text" name="age" placeholder="age" />
+      <input type="submit" value="Send to server" />
+    </form>
+
+    <div id="name"></div>
+    <script>
+      fetch("/name")
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((n) => {
+            const div = document.getElementById("name");
+            const item = document.createElement("p");
+            item.innerHTML = `<strong>${n.name} </strong> <strong>${n.age}</strong> <button onclick="deleteName('${n._id}')"> Delete </button>`;
+            div.appendChild(item);
+          });
+        });
+
+      const deleteName = function (id) {
+        fetch(`/delete/${id}`, {
+          method: "DELETE",
+        })
+          .then((response) => response.json())
+          .then((res) => {
+            console.log("delete successfully");
+          });
+      };
+    </script>
+  </body>
+</html>
