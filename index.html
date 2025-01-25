@@ -13,25 +13,62 @@
     </form>
 
     <div id="name"></div>
+    <div id="update"></div>
     <script>
-      fetch("/name")
-        .then((response) => response.json())
-        .then((data) => {
-          data.forEach((n) => {
+      const getAllUser = function () {
+        fetch("/name")
+          .then((response) => response.json())
+          .then((data) => {
             const div = document.getElementById("name");
-            const item = document.createElement("p");
-            item.innerHTML = `<strong>${n.name} </strong> <strong>${n.age}</strong> <button onclick="deleteName('${n._id}')"> Delete </button>`;
-            div.appendChild(item);
+            div.innerHTML = "";
+            data.forEach((n) => {
+              const item = document.createElement("p");
+              item.innerHTML = `<strong>${n.name} </strong> <strong>${n.age}</strong> <button onclick="showName('${n._id}')"> Update </button> <button onclick="deleteName(event, '${n._id}')"> Delete </button>`;
+              div.appendChild(item);
+            });
           });
-        });
-
-      const deleteName = function (id) {
+      };
+      getAllUser();
+      const deleteName = function (e, id) {
+        console.log(e.target.parentNode);
         fetch(`/delete/${id}`, {
           method: "DELETE",
         })
           .then((response) => response.json())
           .then((res) => {
-            console.log("delete successfully");
+            if (res) {
+              e.target.parentNode.style.display = "none";
+            }
+          });
+      };
+
+      const showName = function (id) {
+        fetch(`/showName/${id}`)
+          .then((response) => response.json())
+          .then((data) => {
+            const update = document.getElementById("update");
+            update.innerHTML = `<h2>Update </h2>
+            <br>
+             <input type="text" name="name" id="input-name" value="${data[0].name}" />
+              <input type="text" name="age" id="input-age" value="${data[0].age}" />
+              <button onclick="updateItem('${data[0]._id}')"> Save Changes </button>
+            `;
+          });
+      };
+
+      const updateItem = function (id) {
+        const name = document.getElementById("input-name").value;
+        const age = document.getElementById("input-age").value;
+        const user = { name, age, id };
+
+        fetch(`/update/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        })
+          .then((response) => response.json())
+          .then((res) => {
+            console.log(res);
           });
       };
     </script>

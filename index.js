@@ -35,7 +35,7 @@ app.post("/addName", async (req, res, next) => {
   Name.insertMany(userData).then((result) => {
     console.log("data is sent");
   });
-  res.send("Success");
+  res.redirect("/");
   next();
 });
 
@@ -44,9 +44,23 @@ app.get("/name", async (req, res) => {
   res.send(data);
 });
 
+app.get("/showName/:id", async (req, res) => {
+  const data = await Name.find({ _id: new ObjectId(req.params.id) });
+  res.send(data);
+});
+
+app.patch("/update/:id", (req, res) => {
+  Name.updateOne(
+    { _id: new ObjectId(req.params.id) },
+    { $set: { name: req.body.name, age: req.body.age } }
+  ).then((result) => {
+    console.log(result);
+  });
+});
+
 app.delete("/delete/:id", (req, res) => {
   Name.deleteOne({ _id: new ObjectId(req.params.id) }).then((result) => {
-    console.log(result);
+    res.send(result.deletedCount > 0);
   });
   console.log(req.params.id);
 });
